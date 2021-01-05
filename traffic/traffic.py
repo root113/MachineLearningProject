@@ -3,15 +3,18 @@ import numpy as np
 import os
 import sys
 import tensorflow as tf
-# import glob
 
+# from tensorflow import keras
 from sklearn.model_selection import train_test_split
+from tensorflow.keras.optimizers import SGD
+# from tensorflow.keras.optimizers import Adam
 
 EPOCHS = 10
 IMG_WIDTH = 30
 IMG_HEIGHT = 30
 NUM_CATEGORIES = 43
 TEST_SIZE = 0.4
+TRAIN_SIZE = 0.5
 
 def main():
 
@@ -25,7 +28,7 @@ def main():
     # Split data into training and testing sets
     labels = tf.keras.utils.to_categorical(labels)
     x_train, x_test, y_train, y_test = train_test_split(
-        np.array(images), np.array(labels), test_size=TEST_SIZE
+        np.array(images), np.array(labels), test_size=TEST_SIZE, train_size=TRAIN_SIZE
     )
 
     # Get a compiled neural network
@@ -75,12 +78,12 @@ def load_data(data_dir):
             for file in os.listdir(folder_path):
                 image = cv2.imread(os.path.join(folder_path, file))
 
-        # resize the image
-        resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+                # resize the image
+                resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
-    # append to images and labels list
-    images.append(resized_image)
-    labels.append(int(folder))
+                # append to images and labels list
+                images.append(resized_image)
+                labels.append(int(folder))
 
     return images, labels
     # raise NotImplementedError
@@ -109,11 +112,31 @@ def get_model():
     ])
 
     # train neural network
+    #model.compile(
+    #    optimizer="adam",
+    #    loss="categorial_crossentropy",
+    #    metrics=["accuracy"]
+    #)
+
+    # opt = Adam(lr=0.001, decay=0.001 / EPOCHS)
+    opt = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True) # better performance
+
+    # print("Time spent: ",time.time()-t0)
+
     model.compile(
-        optimizer="adam",
-        loss="categorial_crossentropy",
+        loss="categorical_crossentropy",
+        optimizer=opt,
         metrics=["accuracy"]
     )
+
+    # train the network
+    # print("Time spent: ",time.time()-t0)
+    print("Network is being trained...")
+    # H = model.fit_generator(
+    #     aug.flow(trainX, trainY, batch_size=BATCH_SIZE),
+    #     validation_data=(testX, testY),
+    #     teps_per_epoch=len(trainX) // BATCH_SIZE,
+    #     epochs=EPOCHS, verbose=1)
 
     return model
     # raise NotImplementedError
@@ -121,19 +144,3 @@ def get_model():
 
 if __name__ == "__main__":
     main()
-
-
-# opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
-# opt = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)   # daha iyi sonuç veriyor
-# print("Time spent: ",time.time()-t0)
-# model.compile(loss="categorical_crossentropy", optimizer=opt,
-#                metrics=["accuracy"])
-
-# train the network
-# print("Time spent: ",time.time()-t0)
-# print("Network is being trained...")
-# H = model.fit_generator(
-#    aug.flow(trainX, trainY, batch_size=BATCH_SIZE),
-#    validation_data=(testX, testY),
-#    steps_per_epoch=len(trainX) // BATCH_SIZE,
-#    epochs=EPOCHS, verbose=1)
