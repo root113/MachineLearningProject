@@ -9,12 +9,13 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras.optimizers import SGD
 # from tensorflow.keras.optimizers import Adam
 
-EPOCHS = 10
+EPOCHS = 20
 IMG_WIDTH = 30
 IMG_HEIGHT = 30
 NUM_CATEGORIES = 43
-TEST_SIZE = 0.4
-TRAIN_SIZE = 0.5
+TEST_SIZE = 0.25
+TRAIN_SIZE = 0.75
+BATCH_SIZE = 64
 
 def main():
 
@@ -35,7 +36,7 @@ def main():
     model = get_model()
 
     # Fit model on training data
-    model.fit(x_train, y_train, epochs=EPOCHS)
+    model.fit(x_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE)
 
     # Evaluate neural network performance
     model.evaluate(x_test,  y_test, verbose=2)
@@ -101,11 +102,11 @@ def get_model():
         # convolutional layer. Learn 32 filters using 3x3 kernel
         tf.keras.layers.Conv2D(32, (3, 3), activation="relu", input_shape=(IMG_WIDTH, IMG_HEIGHT, 3)),
         # pooling layer using 2x2 pool size
-        tf.keras.layers.MaxPooling2D(pool_size=(3, 3)),
+        tf.keras.layers.MaxPooling2D(pool_size=(2, 2)),
         # Flatten units
         tf.keras.layers.Flatten(),
         # add hidden layers with dropout
-        tf.keras.layers.Dense(128, activation="relu"),
+        tf.keras.layers.Dense(256, activation="relu"),
         tf.keras.layers.Dropout(0.5),
         # add output layer with output units for all 43 categories
         tf.keras.layers.Dense(NUM_CATEGORIES, activation="softmax") # softmax turns output to probability distribution
@@ -119,7 +120,7 @@ def get_model():
     #)
 
     # opt = Adam(lr=0.001, decay=0.001 / EPOCHS)
-    opt = SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True) # better performance
+    opt = SGD(lr=0.001, decay=0.001, momentum=0.9, nesterov=True) # better performance
 
     # print("Time spent: ",time.time()-t0)
 
@@ -131,7 +132,7 @@ def get_model():
 
     # train the network
     # print("Time spent: ",time.time()-t0)
-    print("Network is being trained...")
+    print("\nNetwork is being trained...\n")
     # H = model.fit_generator(
     #     aug.flow(trainX, trainY, batch_size=BATCH_SIZE),
     #     validation_data=(testX, testY),
