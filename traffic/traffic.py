@@ -9,12 +9,12 @@ from sklearn.model_selection import train_test_split
 from tensorflow.keras.optimizers import SGD
 # from tensorflow.keras.optimizers import Adam
 
-EPOCHS = 20
+EPOCHS = 10
 IMG_WIDTH = 30
 IMG_HEIGHT = 30
 NUM_CATEGORIES = 43
-TEST_SIZE = 0.25
-TRAIN_SIZE = 0.75
+TEST_SIZE = 0.20
+TRAIN_SIZE = 0.70
 BATCH_SIZE = 64
 
 def main():
@@ -120,7 +120,7 @@ def get_model():
     #)
 
     # opt = Adam(lr=0.001, decay=0.001 / EPOCHS)
-    opt = SGD(lr=0.001, decay=0.001, momentum=0.9, nesterov=True) # better performance
+    opt = SGD(lr=0.00101, decay=0.001, momentum=0.9, nesterov=True) # better performance
 
     # print("Time spent: ",time.time()-t0)
 
