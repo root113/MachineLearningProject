@@ -17,12 +17,12 @@ cur_path = os.getcwd()
 
 #Retrieving the images and their labels
 for i in range(classes):
-    path = os.path.join(cur_path,'traffic/gtsrb',str(i))
+    path = os.path.join(cur_path,'datasets/archive/train',str(i))
     images = os.listdir(path)
 
     for a in images:
         try:
-            image = Image.open(path + '\\'+ a)
+            image = Image.open(path + '/'+ a)
             image = image.resize((30,30))
             image = np.array(image)
             #sim = Image.fromarray(image)
@@ -37,7 +37,7 @@ labels = np.array(labels)
 
 print(data.shape, labels.shape)
 #Splitting training and testing dataset
-X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.1, random_state=42)
 
 print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
@@ -64,7 +64,7 @@ model.add(Dense(43, activation='softmax'))
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 epochs = 15
-history = model.fit(X_train, y_train, batch_size=32, epochs=epochs, validation_data=(X_test, y_test))
+history = model.fit(X_train, y_train, batch_size=64, epochs=epochs, validation_data=(X_test, y_test))
 model.save("my_model.h5")
 
 #plotting graphs for accuracy
@@ -89,7 +89,7 @@ plt.show()
 #testing accuracy on test dataset
 from sklearn.metrics import accuracy_score
 
-y_test = pd.read_csv('Test.csv')
+y_test = pd.read_csv('datasets/archive/Test.csv')
 
 labels = y_test["ClassId"].values
 imgs = y_test["Path"].values
