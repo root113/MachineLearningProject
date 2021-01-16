@@ -60,11 +60,40 @@ model.add(Dense(256, activation='relu'))
 model.add(Dropout(rate=0.5))
 model.add(Dense(43, activation='softmax'))
 
+#Callbacks
+tensorboard_callback = tf.keras.callbacks.TensorBoard(
+    log_dir="./logs",
+    histogram_freq=0,
+    write_graph=True,
+    write_images=False,
+    update_freq='epoch',
+    profile_batch=2,
+    embeddings_freq=0,
+    embeddings_metadata=None
+)
+
+checkpoint_filepath = '/tmp/checkpoint'
+model_checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+    filepath=checkpoint_filepath,
+    save_weights_only=True,
+    monitor='val_accuracy',
+    mode='max',
+    save_best_only=True
+)
+
+callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+
 #Compilation of the model
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 epochs = 15
-history = model.fit(X_train, y_train, batch_size=64, epochs=epochs, validation_data=(X_test, y_test))
+history = model.fit(
+    X_train,
+    y_train,
+    batch_size=64,
+    epochs=epochs,
+    validation_data=(X_test, y_test),
+    callbacks=[tensorboard_callback, model_checkpoint_callback, callback])
 model.save("my_model.h5")
 
 #plotting graphs for accuracy
